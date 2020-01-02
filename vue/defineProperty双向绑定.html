@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <p id="p"></p>
+  <input type="text" id="input">
+
+  <script>
+    let obj = {};
+    let p = document.querySelector('#p');
+    let input = document.querySelector('#input');
+
+    Object.defineProperty(obj, 'name', {
+      get() {
+        return p.innerHTML;
+      },
+      set(val) {
+        p.innerHTML = val;
+        input.value =val;
+      }
+    });
+    obj.name = 1;
+
+    input.addEventListener('input', function (e) {
+      obj.name = e.target.value;
+    });
+
+    // 异步修改
+    setTimeout(() => {
+      obj.name = 4
+    },400)
+  </script>
+</body>
+</html>
