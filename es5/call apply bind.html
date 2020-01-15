@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  
+  <script>
+    Function.prototype.call = function (context, ...arg) {
+      let sFn = Symbol('fn');
+      context  = context || window;
+      context[sFn] = this;
+      arg?context[sFn](...arg):context[sFn]();
+      delete context[sFn];
+    };
+
+    Function.prototype.apply = function (context, arg) {
+      let sFn = Symbol('fn');
+      context  = context || window;
+      context[sFn] = this;
+      arg?context[sFn]([...arg]):context[sFn]();
+      delete context[sFn];
+    };
+
+    Function.prototype.bind = function(context, ...arg) {
+      let self = this;
+      context  = context || window;
+      return function () {
+        let args = [...arg, ...arguments].length?[...arg, ...arguments]:undefined;
+        self.apply(context, args);
+      };
+    };
+
+    let obj = {
+      a: 1
+    };
+    var a = 2;
+
+    function fn(b) {
+      console.log(this.a, b)
+    };
+
+    document.onclick = function () {
+      fn.call(obj,1,2,3)
+      fn.apply(obj,[1,2,3])
+      fn.bind(obj,1)(2,3)
+    }
+
+  </script>
+
+</body>
+</html>

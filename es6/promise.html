@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  
+  <script>
+    function MyPromise (executor) {
+      let self = this;
+      let PENDING = 'PENDING',
+          FULFILLED = 'FULFILLED',
+          REJECTED = 'REJECTED';
+      
+      self.status = PENDING;
+      self.value = null;
+      self.error = null;
+      self.onFulfilledCallbacks = [];
+      self.onRejectedCallbacks = [];
+
+      let resolve = (value) => {
+        if (self.status !== PENDING) return;
+        setTimeout(() => { //模拟 异步更新调用
+          self.status = FULFILLED;
+          self.value = value;
+          self.onFulfilledCallbacks.forEach(cb => {
+            cb(self.value);
+          });
+        })
+      };
+
+      let reject = (error) => {
+        if (self.status !== PENDING) return;
+        setTimeout(() => {
+          self.status = REJECTED;
+          self.error = error;
+          self.onRejectedCallbacks.forEach(cb => {
+            cb(self.error);
+          });
+        });
+      };
+
+      executor(resolve.bind(this), reject.bind(this));
+    };
+    
+    MyPromise.prototype.then = function (onFulfilled, onRejected) {
+      let self = this;
+      if (self.status === 'PENDING') {
+        return new MyPromise((resolve, reject) => {
+          onFulfilled && self.onFulfilledCallbacks.push(value => {
+            try {
+              let res = onFulfilled(value);
+              if (res in MyPromise) {
+                res.then(onFulfilled, onRejected)
+              } else {
+                resolve(res);
+              };
+            } catch (e) {
+              reject(e);
+            }
+          });
+          onRejected && self.onRejectedCallbacks.push(error => {
+            try {
+              let res = onRejected(error);
+              resolve(res);
+            } catch (e) {
+              reject(e);
+            }
+          });
+        });
+      }else if (self.status === 'FULFILLED') {
+        onFulfilled(self.value);
+      } else {
+        onRejected(self.error);
+      };
+    };
+
+    let p = new MyPromise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(1)
+      })
+    });
+
+    p.then(res => {
+      console.log('1'+res)
+      return 14554
+    });
+
+    p.then(res => {
+      console.log('2'+res)
+    },rej=> {
+      console.log(45454)
+    });
+
+    p.then(res => {
+      console.log('3'+res)
+    });
+    console.log(p)
+  </script>
+
+</body>
+</html>

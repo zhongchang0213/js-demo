@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  
+  <script>
+    
+    let myImage = (function () {
+      let imgNode = document.createElement('img');
+      document.body.appendChild(imgNode);
+      return {
+        setSrc(url) {
+          imgNode.src = url;
+        }
+      }
+    })();
+
+    let proxyImage = function () {
+      let img = new Image(); // 创建虚拟dom
+      console.log(12)
+      img.onload = function () {
+        console.log(111)
+        myImage.setSrc(this.src);
+      };
+
+      return {
+        setSrc(url) {
+          myImage.setSrc('default.gif'); // 加载默认资源图片
+          img.src = url;
+        }
+      };
+    }();
+
+    //  设置实际图片路径
+    proxyImage.setSrc('');
+  
+  </script>
+
+</body>
+</html>
